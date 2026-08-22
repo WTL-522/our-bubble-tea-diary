@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Our Bubble Tea Diary 5.1 FINAL</title>
+<style>
+body{font-family:Arial,"Microsoft YaHei";background:#fff7ef;padding:20px;color:#3b2a20}
+.card{background:#fff;border-radius:20px;padding:20px;margin:15px 0;box-shadow:0 5px 18px #0001}
+input,textarea,select{width:100%;padding:12px;margin:6px 0;border-radius:12px;border:1px solid #ddd;box-sizing:border-box}
+button{background:#8b5e3c;color:white;border:0;padding:12px 20px;border-radius:14px}
+.item{background:#fffaf5;padding:15px;border-radius:12px;margin:12px 0}
+.tag{background:#f1dfcf;padding:4px 8px;border-radius:15px}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>🧋 Our Bubble Tea Diary 5.1 FINAL</h1>
+<p>两个人的奶茶记忆博物馆</p>
+<div id="stats"></div>
+</div>
+
+<div class="card">
+<h2>新增奶茶</h2>
+<input id="brand" placeholder="品牌">
+<input id="name" placeholder="产品名称">
+<input id="date" type="date">
+<input id="place" placeholder="地点">
+<textarea id="taste" placeholder="口味分析"></textarea>
+<select id="sweet">
+<option>正常糖</option><option>三分糖</option><option>五分糖</option><option>无糖</option>
+</select>
+<select id="score">
+<option>★★★★★</option><option>★★★★</option><option>★★★</option><option>★★</option><option>★</option>
+</select>
+<textarea id="memory" placeholder="回忆"></textarea>
+<button id="add">加入收藏</button>
+</div>
+
+<div class="card">
+<h2>收藏记录</h2>
+<div id="list"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://pqldlyrpxktlbtbjiiki.supabase.co";
+const SUPABASE_KEY="sb_publishable_DwcDOsLICxVbqlEev7NiuA_r8M-f5Gq";
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+async function load(){
+ const {data,error}=await db.from("tea_records").select("*").order("id",{ascending:false});
+ if(error){document.getElementById("list").innerHTML="数据库连接失败";console.log(error);return;}
+ document.getElementById("stats").innerHTML="已收藏 "+data.length+" 杯奶茶";
+ document.getElementById("list").innerHTML=data.map(x=>`
+ <div class="item">
+ <b>${x.brand} · ${x.name}</b><br>
+ ${x.date||""} | ${x.place||""}<br>
+ <span class="tag">${x.sweet||""}</span>
+ <span class="tag">${x.score||""}</span>
+ <p>${x.taste||""}</p>
+ <p>💭 ${x.memory||""}</p>
+ </div>`).join("");
+}
+
+document.getElementById("add").onclick=async()=>{
+ const {error}=await db.from("tea_records").insert({
+ brand:brand.value,
+ name:name.value,
+ date:date.value,
+ place:place.value,
+ taste:taste.value,
+ sweet:sweet.value,
+ score:score.value,
+ memory:memory.value
+ });
+ if(error){alert(error.message);return;}
+ alert("收藏成功");
+ load();
+};
+
+load();
+</script>
+</body>
+</html>
