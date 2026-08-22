@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Bubble Tea Diary</title>
+<style>
+body{margin:0;background:#fff7ef;font-family:"Microsoft YaHei",Arial;color:#3b2a20;padding:18px}
+.card{background:#fff;border-radius:20px;padding:18px;margin:15px 0;box-shadow:0 5px 18px #0001}
+h1{font-size:28px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input,textarea,select{width:100%;padding:12px;border-radius:12px;border:1px solid #ddd;box-sizing:border-box;margin:5px 0}
+button{background:#8b5e3c;color:white;border:0;padding:12px 20px;border-radius:14px}
+.stat{display:flex;justify-content:space-around;text-align:center}
+.num{font-size:28px;font-weight:bold}
+.item{background:#fffaf5;padding:15px;border-radius:12px;margin:12px 0;border-left:5px solid #d8a47f}
+</style>
+</head>
+<body>
+
+<h1>🧋 Our Bubble Tea Diary</h1>
+<p>两个人的奶茶记忆博物馆</p>
+
+<div class="card stat">
+<div><div class="num" id="count">0</div>杯</div>
+<div><div class="num" id="brands">0</div>品牌</div>
+<div><div class="num" id="places">0</div>城市</div>
+</div>
+
+<div class="card">
+<h2>🧋 添加奶茶</h2>
+<div class="grid">
+<input id="brand" placeholder="品牌">
+<input id="name" placeholder="产品名称">
+</div>
+<div class="grid">
+<input id="date" type="date">
+<input id="place" placeholder="地点">
+</div>
+<textarea id="taste" placeholder="口味描述"></textarea>
+<select id="score">
+<option>★★★★★</option>
+<option>★★★★</option>
+<option>★★★</option>
+<option>★★</option>
+<option>★</option>
+</select>
+<textarea id="memory" placeholder="这杯奶茶的故事"></textarea>
+<button onclick="addTea()">加入收藏</button>
+</div>
+
+<div class="card">
+<h2>📖 奶茶时间线</h2>
+<div id="list"></div>
+</div>
+
+<script>
+let data=JSON.parse(localStorage.getItem("tea")||"[]");
+
+function addTea(){
+data.push({
+brand:brand.value,
+name:name.value,
+date:date.value,
+place:place.value,
+taste:taste.value,
+score:score.value,
+memory:memory.value
+});
+localStorage.setItem("tea",JSON.stringify(data));
+document.querySelectorAll("input,textarea").forEach(e=>e.value="");
+render();
+}
+
+function render(){
+count.innerHTML=data.length;
+brands.innerHTML=[...new Set(data.map(x=>x.brand))].length;
+places.innerHTML=[...new Set(data.map(x=>x.place))].length;
+
+list.innerHTML="";
+data.slice().reverse().forEach(x=>{
+list.innerHTML+=`
+<div class="item">
+<b>${x.brand} · ${x.name}</b><br>
+${x.date} ｜ ${x.place}<br>
+${x.score}<br>
+${x.taste}<br>
+💭 ${x.memory}
+</div>`;
+});
+}
+render();
+</script>
+
+</body>
+</html>
