@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Our Bubble Tea Diary</title>
 <style>
-body{background:#fff7ef;font-family:Arial,"Microsoft YaHei";padding:20px;color:#3b2a20}
-.card{background:white;border-radius:20px;padding:20px;margin:15px 0}
-input,textarea{width:100%;padding:10px;margin:5px 0;border-radius:10px;border:1px solid #ddd;box-sizing:border-box}
-button{background:#8b5e3c;color:white;padding:12px;border:0;border-radius:12px}
-.item{padding:12px;background:#fffaf5;border-radius:10px;margin:10px 0}
+body{background:#fff7ef;font-family:Arial,'Microsoft YaHei';padding:20px;color:#3b2a20}
+.card{background:#fff;border-radius:20px;padding:20px;margin:15px 0}
+input,textarea{width:100%;padding:10px;margin:5px 0;box-sizing:border-box;border-radius:10px;border:1px solid #ddd}
+button{background:#8b5e3c;color:#fff;padding:12px;border:0;border-radius:12px}
+.item{background:#fffaf5;padding:12px;margin:10px 0;border-radius:12px}
 </style>
 </head>
 <body>
@@ -20,16 +20,23 @@ button{background:#8b5e3c;color:white;padding:12px;border:0;border-radius:12px}
 <input id="name" placeholder="产品名称">
 <input id="date" type="date">
 <input id="place" placeholder="地点">
-<textarea id="taste" placeholder="口味"></textarea>
+<textarea id="taste" placeholder="口味分析"></textarea>
 <textarea id="memory" placeholder="回忆"></textarea>
-<button onclick="add()">加入收藏</button>
+<button id="add">加入收藏</button>
 </div>
 <div class="card"><h2>记录</h2><div id="list"></div></div>
 <script>
-const URL="https://pqldlyrpxktlbtbjiiki.supabase.co";
-const KEY="sb_publishable_DwcDOsLICxVbqlEev7NiuA_r8M-f5Gq";
-async function load(){let r=await fetch(URL+"/rest/v1/tea_records?select=*",{headers:{apikey:KEY,Authorization:"Bearer "+KEY}});let d=await r.json();list.innerHTML=d.map(x=>`<div class="item"><b>${x.brand} ${x.name}</b><br>${x.date} ${x.place}<br>${x.taste}<br>${x.memory}</div>`).join("")}
-async function add(){await fetch(URL+"/rest/v1/tea_records",{method:"POST",headers:{apikey:KEY,Authorization:"Bearer "+KEY,"Content-Type":"application/json"},body:JSON.stringify({brand:brand.value,name:name.value,date:date.value,place:place.value,taste:taste.value,memory:memory.value})});load()}
+const SUPABASE_URL="https://pqldlyrpxktlbtbjiiki.supabase.co";
+const SUPABASE_KEY="sb_publishable_DwcDOsLICxVbqlEev7NiuA_r8M-f5Gq";
+async function load(){
+ let r=await fetch(SUPABASE_URL+"/rest/v1/tea_records?select=*",{headers:{apikey:SUPABASE_KEY}});
+ let d=await r.json();
+ list.innerHTML=d.map(x=>`<div class="item"><b>${x.brand} · ${x.name}</b><br>${x.date} ${x.place}<br>${x.taste}<br>${x.memory}</div>`).join("");
+}
+add.onclick=async()=>{
+ await fetch(SUPABASE_URL+"/rest/v1/tea_records",{method:"POST",headers:{apikey:SUPABASE_KEY,"Content-Type":"application/json"},body:JSON.stringify({brand:brand.value,name:name.value,date:date.value,place:place.value,taste:taste.value,memory:memory.value})});
+ load();
+};
 load();
 </script>
 </body>
